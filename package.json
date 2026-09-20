@@ -1,0 +1,22 @@
+{
+  "name": "taskflow-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:client": "esbuild src/client.ts --bundle --format=esm --target=es2020 --outfile=public/client.js",
+    "dev": "npm run build:client && wrangler dev",
+    "deploy": "npm run build:client && wrangler deploy",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "agents": "latest",
+    "@cloudflare/voice": "latest"
+  },
+  "devDependencies": {
+    "wrangler": "latest",
+    "typescript": "^5.5.0",
+    "esbuild": "latest",
+    "@cloudflare/workers-types": "latest"
+  }
+}

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TaskFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF4E9;
+    --card: #FFFDF8;
+    --ink: #332A22;
+    --ink-soft: #6B6053;
+    --rule: #E4D9C4;
+    --mustard: #C99A3E;
+    --mustard-ink: #4A3A18;
+    --sage: #7C8B6F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px;
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px);
+    background-size: 100% 32px;
+    background-position: 0 140px;
+    font-family: "Work Sans", sans-serif;
+    color: var(--ink);
+  }
+
+  .page {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 18px 40px -24px rgba(51, 42, 34, 0.35);
+    padding: 28px 28px 24px;
+    transform: rotate(-0.4deg);
+  }
+
+  .tape {
+    position: absolute;
+    width: 90px;
+    height: 26px;
+    background: rgba(201, 154, 62, 0.35);
+    top: -12px;
+    left: 36px;
+    transform: rotate(-6deg);
+    border: 1px solid rgba(201, 154, 62, 0.25);
+  }
+
+  header {
+    position: relative;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: "Caveat", cursive;
+    font-weight: 700;
+    font-size: 2.6rem;
+    line-height: 1;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  header p {
+    margin: 6px 0 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  #log {
+    height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 4px 2px 8px;
+  }
+
+  .entry {
+    max-width: 78%;
+    padding: 10px 14px;
+    font-size: 0.97rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    position: relative;
+  }
+
+  .entry.user {
+    align-self: flex-end;
+    background: var(--mustard);
+    color: var(--mustard-ink);
+    border-radius: 10px 10px 2px 10px;
+    transform: rotate(0.6deg);
+  }
+
+  .entry.assistant {
+    align-self: flex-start;
+    background: transparent;
+    border-left: 3px solid var(--sage);
+    padding-left: 12px;
+    color: var(--ink);
+  }
+
+  form {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid var(--rule);
+    background: transparent;
+    padding: 8px 2px;
+    font-family: "Work Sans", sans-serif;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  input::placeholder { color: #A79A85; }
+  input:focus { outline: none; border-bottom-color: var(--mustard); }
+
+  button {
+    border: none;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: "Work Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  button:hover { background: var(--mustard-ink); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+
+  #voice-btn {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 10px 14px;
+    font-size: 1.05rem;
+  }
+  #voice-btn.active {
+    background: var(--sage);
+    color: #fff;
+    border-color: var(--sage);
+  }
+
+  #voice-status {
+    margin: 6px 2px 0;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    min-height: 1em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .page { animation: settle 0.5s ease-out; }
+  }
+  @keyframes settle {
+    from { opacity: 0; transform: rotate(-0.4deg) translateY(8px); }
+    to { opacity: 1; transform: rotate(-0.4deg) translateY(0); }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="tape"></div>
+    <header>
+      <h1>TaskFlow</h1>
+      <p>Tell it what you need to do — it'll write it down and remind you.</p>
+    </header>
+    <div id="log"></div>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="remind me to call the bank tomorrow at 10am" />
+      <button id="voice-btn" type="button" title="Talk instead of typing">🎙</button>
+      <button id="send" type="submit">Send</button>
+    </form>
+    <p id="voice-status"></p>
+  </div>
+
+  <!-- Built from src/client.ts by `npm run build:client` (esbuild). -->
+  <script type="module" src="/client.js"></script>
+</body>
+</html>

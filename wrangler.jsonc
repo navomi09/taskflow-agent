@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "taskflow-agent",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Gives the Worker access to Workers AI (Llama 3.3), no API key needed.
+  "ai": {
+    "binding": "AI"
+  },
+
+  // The Agent class runs as a Durable Object — this is what gives it
+  // a durable identity, persistent state, and scheduling.
+  "durable_objects": {
+    "bindings": [
+      { "name": "TaskFlowAgent", "class_name": "TaskFlowAgent" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["TaskFlowAgent"] }
+  ],
+
+  // Serves the chat UI in /public as static assets on the same Worker.
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS"
+  }
+}

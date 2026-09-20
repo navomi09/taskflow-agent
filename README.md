@@ -17,7 +17,7 @@ small JSON action like add a task, list tasks, complete one, or just chat.
 One thing that tripped me up: I originally had the model compute the actual
 reminder datetime itself, and it kept anchoring things to 1970 (some Unix
 epoch default) instead of doing the date math right. Now the model only
-extracts the time *phrase* ("tomorrow at 5pm") and a small function in code
+extracts the time ("tomorrow at 5pm") and a small function in code
 does the actual arithmetic and much more reliable.
 
 `this.schedule(...)` books the reminder as a durable callback, so it survives

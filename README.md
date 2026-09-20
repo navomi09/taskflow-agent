@@ -1,7 +1,6 @@
 # TaskFlow
 
-A personal task/reminder agent on Cloudflare. You chat with it in plain
-English — "remind me to call the bank tomorrow at 10am" — and it figures out
+A personal task/reminder agent on Cloudflare. You chat with it - "remind me to call the bank tomorrow at 10am"; and it figures out
 what you meant, tracks it, and reminds you when it's due.
 
 Built on Workers AI (Llama 3.3) + the Agents SDK (Durable Objects under the
@@ -14,21 +13,21 @@ instance (random id in localStorage), so it's really one durable object per
 user.
 
 Every message goes to Llama 3.3 with a system prompt asking it to return a
-small JSON action — add a task, list tasks, complete one, or just chat.
+small JSON action like add a task, list tasks, complete one, or just chat.
 One thing that tripped me up: I originally had the model compute the actual
 reminder datetime itself, and it kept anchoring things to 1970 (some Unix
 epoch default) instead of doing the date math right. Now the model only
 extracts the time *phrase* ("tomorrow at 5pm") and a small function in code
-does the actual arithmetic — much more reliable.
+does the actual arithmetic and much more reliable.
 
 `this.schedule(...)` books the reminder as a durable callback, so it survives
 even if the Worker instance gets evicted in between.
 
-The front end used to be plain `fetch()` calls — worked, but every reply
+The front end used to be plain `fetch()` calls - worked, but every reply
 needed a full request/response round trip, and two tabs wouldn't see each
 other's changes. It now uses the SDK's `AgentClient` over a WebSocket
 (`src/client.ts`), so state pushes to the browser the moment the server
-changes it — open two tabs and they stay in sync live.
+changes it, open two tabs and they stay in sync live.
 
 `AgentClient` is an npm package meant to be bundled, not dropped in with a
 plain `<script>` tag, so there's a small esbuild step now
@@ -39,19 +38,19 @@ second terminal (or just restart `npm run dev`) to pick up the change —
 Wrangler doesn't rebuild it for you automatically.
 
 Also tripped on this one: `@callable()` (used for the WebSocket RPC calls)
-needs `target: "ES2021"` in tsconfig — I had it on ES2022, which silently
+needs `target: "ES2021"` in tsconfig. I had it on ES2022, which silently
 broke the decorator instead of erroring at build time. Fixed by extending
 `agents/tsconfig` instead of hand-rolling compiler options.
 
 ## Voice
 
-The mic button uses `@cloudflare/voice` — `WorkersAIFluxSTT` for
+The mic button uses `@cloudflare/voice` and `WorkersAIFluxSTT` for
 speech-to-text, `WorkersAITTS` for text-to-speech, both on the same Workers
 AI binding as the LLM. The server's `onTurn` handler (fired once per spoken
-turn) just calls `sendMessage()` — the same method the typed chat form
+turn) just calls `sendMessage()` on the same method the typed chat form
 calls — so a task added by voice and one added by typing go through
 identical logic and land in the same shared history. Needs mic permission
-and a secure context (`localhost` or HTTPS — a deployed `*.workers.dev` URL
+and a secure context (`localhost` or HTTPS - a deployed `*.workers.dev` URL
 qualifies).
 
 ## Run it locally
